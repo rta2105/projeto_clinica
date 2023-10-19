@@ -1,4 +1,4 @@
-## Projeto de Clinica para Programação p/ Internet 2
+## Projeto de Clinica 
 
 No que consite este projeto:
 - Administrar medicos e especialidade e agendas

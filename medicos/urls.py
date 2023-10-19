@@ -11,6 +11,7 @@ urlpatterns = [
     path('agendar/apagar/<int:pk>/', views.agenda_deletar, name='agendar_consulta_deletar'),
     path('minhas/consultas/', views.agenda_lista, name="agenda_lista"),
     path('admim/lista/medicos/', views.medico_lista, name="medicos_lista"),
-    path('admim/lista/especialidades/', views.especialidade_lista, name="especialidade_lista")
+    path('admim/lista/especialidades/', views.especialidade_lista, name="especialidade_lista"),
+    path('admim/lista/unidades/', views.unidade_lista, name="unidade_lista")
     
 ]

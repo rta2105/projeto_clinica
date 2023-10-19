@@ -10,7 +10,17 @@ class Especialidade(models.Model):
     
     def __str__(self):
         return f'{self.nome}'
+
+class Unidade(models.Model):
+    nome = models.CharField(verbose_name="Nome", max_length=200)
     
+    def __str__(self):
+        return f'{self.nome}'
+
+class AgendaManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(dia__gte=date.today())
+
 class Medico(models.Model):
     nome = models.CharField(verbose_name="Nome", max_length=200)
     email = models.EmailField(verbose_name="Email")
@@ -26,6 +36,9 @@ class Medico(models.Model):
     especialidade = ForeignKey(Especialidade,
                                on_delete=models.CASCADE,
                                related_name='medicos')
+    unidade = ForeignKey(Unidade, 
+                         on_delete=models.CASCADE, 
+                         related_name='medicos')
     
     def __str__(self):
         return f'{self.nome}'
@@ -40,25 +53,96 @@ def validar_dia(value):
         raise ValidationError('Escolha um dia útil da semana.')
 
 class Agenda(models.Model):
-    medico = ForeignKey(Medico, on_delete=models.CASCADE, related_name='agenda')
-    dia = models.DateField(help_text="Insira uma data para agenda", validators=[validar_dia])
-    
-    HORARIOS = (
-        ("1", "07:00 ás 08:00"),
-        ("2", "08:00 ás 09:00"),
-        ("3", "09:00 ás 10:00"),
-        ("4", "10:00 ás 11:00"),
-        ("5", "11:00 ás 12:00"),
-    )
-    horario = models.CharField(max_length=10, choices=HORARIOS)
-    
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, 
-        verbose_name='Usuário', 
-        on_delete=models.CASCADE
-    )
-    class Meta:
-        unique_together = ('horario', 'dia')
-        
+    medico = ForeignKey(Medico, on_delete=models.CASCADE, related_name='agendas')
+    dia = models.DateField(verbose_name="Dia", validators=[validar_dia])
+    horario_inicio = models.TimeField(verbose_name="Horário de Início")
+    horario_fim = models.TimeField(verbose_name="Horário de Fim")
+    objects = AgendaManager()
+
     def __str__(self):
-        return f'{self.dia.strftime("%b %d %Y")} - {self.get_horario_display()} - {self.medico}'
+        return f'{self.medico} - {self.dia} - {self.horario_inicio} - {self.horario_fim}'
+    
+    class Meta:
+        unique_together = ['medico', 'dia', 'horario_inicio', 'horario_fim']
+        ordering = ['dia', 'horario_inicio']
+        verbose_name = 'Agenda'
+        verbose_name_plural = 'Agendas'
+
+class Consulta(models.Model):
+    agenda = ForeignKey(Agenda, on_delete=models.CASCADE, related_name='consultas')
+    paciente = ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='consultas')
+    data_agendamento = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f'{self.agenda} - {self.paciente} - {self.data_agendamento}'
+    
+    class Meta:
+        unique_together = ['agenda', 'paciente']
+        ordering = ['data_agendamento']
+        verbose_name = 'Consulta'
+        verbose_name_plural = 'Consultas'
+
+class Horario(models.Model):
+    horario_inicio = models.TimeField(verbose_name="Horário de Início")
+    horario_fim = models.TimeField(verbose_name="Horário de Fim")
+    
+    def __str__(self):
+        return f'{self.horario_inicio} - {self.horario_fim}'
+    
+    class Meta:
+        ordering = ['horario_inicio']
+        verbose_name = 'Horário'
+        verbose_name_plural = 'Horários'
+
+class HorarioAtendimento(models.Model):
+    medico = ForeignKey(Medico, on_delete=models.CASCADE, related_name='horarios')
+    dia = models.DateField(verbose_name="Dia", validators=[validar_dia])
+    horario = ForeignKey(Horario, on_delete=models.CASCADE, related_name='horarios')
+    
+    def __str__(self):
+        return f'{self.medico} - {self.dia} - {self.horario}'
+    
+    class Meta:
+        unique_together = ['medico', 'dia', 'horario']
+        ordering = ['dia', 'horario']
+        verbose_name = 'Horário de Atendimento'
+        verbose_name_plural = 'Horários de Atendimento'
+
+class HorarioAtendimentoManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(dia__gte=date.today())
+
+class HorarioAtendimentoDisponivel(models.Model):
+    medico = ForeignKey(Medico, on_delete=models.CASCADE, related_name='horarios_disponiveis')
+    dia = models.DateField(verbose_name="Dia", validators=[validar_dia])
+    horario = ForeignKey(Horario, on_delete=models.CASCADE, related_name='horarios_disponiveis')
+    objects = HorarioAtendimentoManager()
+    
+    def __str__(self):
+        return f'{self.medico} - {self.dia} - {self.horario}'
+    
+    class Meta:
+        unique_together = ['medico', 'dia', 'horario']
+        ordering = ['dia', 'horario']
+        verbose_name = 'Horário de Atendimento Disponível'
+        verbose_name_plural = 'Horários de Atendimento Disponíveis'
+
+class HorarioAtendimentoDisponivelManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(dia__gte=date.today())
+
+class ConsultaDisponivel(models.Model):
+    medico = ForeignKey(Medico, on_delete=models.CASCADE, related_name='consultas_disponiveis')
+    dia = models.DateField(verbose_name="Dia", validators=[validar_dia])
+    horario_inicio = models.TimeField(verbose_name="Horário de Início")
+    horario_fim = models.TimeField(verbose_name="Horário de Fim")
+    objects = HorarioAtendimentoDisponivelManager()
+    
+    def __str__(self):
+        return f'{self.medico} - {self.dia} - {self.horario_inicio} - {self.horario_fim}'
+    
+    class Meta:
+        unique_together = ['medico', 'dia', 'horario_inicio', 'horario_fim']
+        ordering = ['dia', 'horario_inicio']
+        verbose_name = 'Consulta Disponível'
+        verbose_name_plural = 'Consultas Disponíveis'
