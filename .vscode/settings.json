@@ -3,5 +3,17 @@
         "activityBar.background": "#411960",
         "titleBar.activeBackground": "#5B2387",
         "titleBar.activeForeground": "#FBF9FD"
-    }
+    },
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./venv",
+        "-p",
+        "*test.py"
+    ],
+    "python.testing.pytestEnabled": true,
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestArgs": [
+        "venv"
+    ]
 }

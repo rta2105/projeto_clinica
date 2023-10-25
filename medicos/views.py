@@ -84,7 +84,6 @@ class AgendaUpdateView(LoginRequiredMixin, TestMixinIsAdmin, UpdateView):
     template_name = 'medicos/agenda_form.html'
     success_url = reverse_lazy('medicos:agenda_lista')
 
-
 medico_cadastro = MedicoCreateView.as_view()
 medico_lista = MedicoListView.as_view()
 especialidade_cadastro = EspecialidadeCreateView.as_view()
