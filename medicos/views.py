@@ -19,20 +19,23 @@ class TestMixinIsAdmin(UserPassesTestMixin):
         return redirect("accounts:index")
 
 class MedicoCreateView(LoginRequiredMixin, TestMixinIsAdmin, CreateView):
+    """
+    class para visualizar o formulario do médico
+    """
     model = Medico
     fields = ['nome', 'crm', 'especialidade', 'unidade']
-    template_name = 'medicos/medico_form.html'
+    template_name = 'medicos/cadastro.html'
     success_url = reverse_lazy('medicos:medico_lista')
 
 class MedicoListView(LoginRequiredMixin, TestMixinIsAdmin, ListView):
     model = Medico
-    template_name = 'medicos/medico_list.html'
+    template_name = 'medicos/medicos_list.html'
     paginate_by = 10
 
 class EspecialidadeCreateView(LoginRequiredMixin, TestMixinIsAdmin, CreateView):
     model = Especialidade
     fields = ['nome']
-    template_name = 'medicos/especialidade_form.html'
+    template_name = 'medicos/especialidade_list.html'
     success_url = reverse_lazy('medicos:especialidade_lista')
 
 class EspecialidadeListView(LoginRequiredMixin, TestMixinIsAdmin, ListView):
@@ -43,7 +46,7 @@ class EspecialidadeListView(LoginRequiredMixin, TestMixinIsAdmin, ListView):
 class AgendaCreateView(LoginRequiredMixin, TestMixinIsAdmin, CreateView):
     model = Agenda
     fields = ['medico', 'dia', 'horario_inicio', 'horario_fim']
-    template_name = 'medicos/agenda_form.html'
+    template_name = 'medicos/agenda_cadastro.html'
     success_url = reverse_lazy('medicos:agenda_lista')
 
 class AgendaListView(LoginRequiredMixin, TestMixinIsAdmin, ListView):

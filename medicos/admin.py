@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from medicos.models import Especialidade, Medico, Agenda, Consulta, Horario, Unidade
+from .models import Especialidade, Medico, Agenda, Consulta, Horario, Unidade
 
 
 class EspecialidadeAdmin(admin.ModelAdmin):
