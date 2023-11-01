@@ -1,9 +1,9 @@
 ## Projeto de Clinica 
 
 No que consite este projeto:
-- Administrar medicos e especialidade e agendas
+- Administrar estagiarios e especialidade e agendas
 - Criar uma agenda para disponibilizar as consultas
-- Permitir o usuario escolher um consulta em dia e horario de acordo com agenda do medico.
+- Permitir o usuario escolher um consulta em dia e horario de acordo com agenda do estagiario.
 
 ## Configurando o ambiente para executar a aplicação web.
 Faça o download deste repositorio:
